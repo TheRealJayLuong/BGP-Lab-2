@@ -1,0 +1,139 @@
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+aqm-register-fnf
+!
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 1.1.1.1 255.255.255.0
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 150.1.1.1 255.255.255.0
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.0.0.5 255.255.255.252
+!
+interface Ethernet1/0
+ no shutdown
+ ip address 10.0.0.1 255.255.255.252
+!
+!
+router eigrp 254
+ network 1.0.0.0
+ network 10.0.0.0
+ network 150.0.0.0
+ network 150.1.0.0
+!
+router bgp 254
+ bgp cluster-id 55.55.55.55
+ bgp log-neighbor-changes
+ redistribute connected route-map CONNECTED
+ neighbor 2.2.2.2 remote-as 254
+ neighbor 2.2.2.2 password CCNP
+ neighbor 2.2.2.2 update-source Loopback0
+ neighbor 2.2.2.2 timers 5 15
+ neighbor 2.2.2.2 route-reflector-client
+ neighbor 2.2.2.2 send-community
+ neighbor 3.3.3.3 remote-as 254
+ neighbor 3.3.3.3 password CCNP
+ neighbor 3.3.3.3 update-source Loopback0
+ neighbor 3.3.3.3 timers 5 15
+ neighbor 3.3.3.3 send-community
+ neighbor 4.4.4.4 remote-as 254
+ neighbor 4.4.4.4 password CCNP
+ neighbor 4.4.4.4 update-source Loopback0
+ neighbor 4.4.4.4 timers 5 15
+ neighbor 4.4.4.4 route-reflector-client
+ neighbor 4.4.4.4 send-community
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map CONNECTED permit 10
+ match interface Ethernet0/0
+ set community local-AS
+!
+route-map CONNECTED deny 20
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end

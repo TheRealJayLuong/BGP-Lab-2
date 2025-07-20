@@ -1,0 +1,124 @@
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+aqm-register-fnf
+!
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 2.2.2.2 255.255.255.0
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 150.2.2.2 255.255.255.0
+!
+interface Ethernet1/0
+ no shutdown
+ ip address 10.0.0.2 255.255.255.252
+!
+!
+router eigrp 254
+ network 2.0.0.0
+ network 10.0.0.0
+ network 150.0.0.0
+!
+router bgp 254
+ bgp log-neighbor-changes
+ redistribute connected route-map CONNECTED
+ neighbor INTERNAL peer-group
+ neighbor INTERNAL remote-as 254
+ neighbor INTERNAL password CCNP
+ neighbor INTERNAL update-source Loopback0
+ neighbor INTERNAL timers 5 15
+ neighbor INTERNAL send-community
+ neighbor 1.1.1.1 peer-group INTERNAL
+ neighbor 3.3.3.3 peer-group INTERNAL
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map CONNECTED permit 10
+ match interface Ethernet0/0
+ set community local-AS
+!
+route-map CONNECTED deny 20
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end

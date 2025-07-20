@@ -1,0 +1,142 @@
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+aqm-register-fnf
+!
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 3.3.3.3 255.255.255.0
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 150.3.3.3 255.255.255.0
+!
+interface Ethernet1/0
+ no shutdown
+ ip address 10.0.0.6 255.255.255.252
+!
+interface Ethernet1/2
+ no shutdown
+ ip address 10.0.0.13 255.255.255.252
+!
+router eigrp 254
+ network 3.0.0.0
+ network 10.0.0.0
+ network 150.0.0.0
+!
+router bgp 254
+ bgp cluster-id 55.55.55.55
+ bgp log-neighbor-changes
+ redistribute connected route-map CONNECTED
+ neighbor 1.1.1.1 remote-as 254
+ neighbor 1.1.1.1 password CCNP
+ neighbor 1.1.1.1 update-source Loopback0
+ neighbor 1.1.1.1 timers 5 15
+ neighbor 1.1.1.1 send-community
+ neighbor 2.2.2.2 remote-as 254
+ neighbor 2.2.2.2 password CCNP
+ neighbor 2.2.2.2 update-source Loopback0
+ neighbor 2.2.2.2 timers 5 15
+ neighbor 2.2.2.2 route-reflector-client
+ neighbor 2.2.2.2 send-community
+ neighbor 2.2.2.2 route-map LOCAL-PREF in
+ neighbor 4.4.4.4 remote-as 254
+ neighbor 4.4.4.4 password CCNP
+ neighbor 4.4.4.4 update-source Loopback0
+ neighbor 4.4.4.4 timers 5 15
+ neighbor 4.4.4.4 route-reflector-client
+ neighbor 4.4.4.4 send-community
+ neighbor 4.4.4.4 route-map LOCAL-PREF in
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map CONNECTED permit 10
+ match interface Ethernet0/0
+ set community local-AS
+!
+route-map CONNECTED deny 20
+!
+route-map LOCAL-PREF permit 10
+ set local-preference 200
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end
